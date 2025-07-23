@@ -1,0 +1,241 @@
+/* Custom styles for Resume ATS Analyzer */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --dark-color: #212529;
+    --secondary-color: #6c757d;
+}
+
+body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Upload Area Styles */
+.upload-area {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: #2d2d2d;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color) !important;
+    background-color: #333333;
+}
+
+.upload-area.dragover {
+    border-color: var(--primary-color) !important;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.upload-area.uploaded {
+    border-color: var(--success-color) !important;
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+/* Score Circle */
+.score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary-color) 0deg, var(--primary-color) calc(3.6deg * var(--score, 0)), #495057 calc(3.6deg * var(--score, 0)), #495057 360deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.score-circle::before {
+    content: '';
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: #212529;
+    position: absolute;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    z-index: 1;
+}
+
+.score-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    z-index: 1;
+}
+
+/* Score Breakdown */
+.score-breakdown {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Keyword Badges */
+.keyword-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.keyword-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.keyword-container::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+.keyword-container::-webkit-scrollbar-thumb {
+    background: #6c757d;
+    border-radius: 3px;
+}
+
+.keyword-container::-webkit-scrollbar-thumb:hover {
+    background: #495057;
+}
+
+/* Card Enhancements */
+.card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Loading Animation */
+.spinner-border {
+    animation: spinner-border 0.75s linear infinite;
+}
+
+/* Button Enhancements */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+/* Form Enhancements */
+.form-control, .form-select {
+    background-color: #2d2d2d;
+    border-color: #495057;
+    color: #ffffff;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #2d2d2d;
+    border-color: var(--primary-color);
+    color: #ffffff;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Chart Container */
+canvas {
+    max-height: 300px !important;
+}
+
+/* Alert Enhancements */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .score-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .score-circle::before {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .score-value {
+        font-size: 1.5rem;
+    }
+    
+    .display-5 {
+        font-size: 2rem;
+    }
+}
+
+/* Animation for score circle */
+@keyframes scoreAnimation {
+    from {
+        background: conic-gradient(var(--primary-color) 0deg, var(--primary-color) 0deg, #495057 0deg, #495057 360deg);
+    }
+    to {
+        background: conic-gradient(var(--primary-color) 0deg, var(--primary-color) calc(3.6deg * var(--score, 0)), #495057 calc(3.6deg * var(--score, 0)), #495057 360deg);
+    }
+}
+
+/* Utility Classes */
+.text-gradient {
+    background: linear-gradient(45deg, var(--primary-color), var(--info-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.border-gradient {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, var(--primary-color), var(--info-color)) 1;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading .spinner-border {
+    display: inline-block;
+}
+
+/* Success States */
+.success-animation {
+    animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

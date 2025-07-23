@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - Gopi's Resume Analyzer{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Header -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-light mb-1">
+                    <i class="bi bi-analytics text-primary me-2"></i>
+                    Analysis Results
+                </h2>
+                <p class="text-muted">Resume: <strong>{{ analysis.filename }}</strong></p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('download_pdf', analysis_id=analysis.id) }}" class="btn btn-success">
+                    <i class="bi bi-download me-1"></i>
+                    Download PDF Report
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Analyze Another
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Score -->
+    <div class="col-12 mb-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="score-circle mx-auto mb-3 mb-md-0">
+                            <span class="score-value">{{ analysis.total_score }}</span>
+                            <span class="score-label">/ 100</span>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <h3 class="text-light mb-3">Overall ATS Score</h3>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="score-breakdown">
+                                    <h5 class="text-primary mb-1">{{ analysis.keyword_score }}/60</h5>
+                                    <small class="text-muted">Keyword Match<br>
+                                        {% if analysis.keyword_score >= 50 %}
+                                            <span class="text-success">Excellent</span>
+                                        {% elif analysis.keyword_score >= 40 %}
+                                            <span class="text-warning">Good</span>
+                                        {% else %}
+                                            <span class="text-danger">Needs Work</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="score-breakdown">
+                                    <h5 class="text-success mb-1">{{ analysis.grammar_score }}/20</h5>
+                                    <small class="text-muted">Grammar & Language<br>
+                                        {% if analysis.grammar_score >= 18 %}
+                                            <span class="text-success">Excellent</span>
+                                        {% elif analysis.grammar_score >= 15 %}
+                                            <span class="text-warning">Good</span>
+                                        {% else %}
+                                            <span class="text-danger">Needs Work</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="score-breakdown">
+                                    <h5 class="text-warning mb-1">{{ analysis.format_score }}/20</h5>
+                                    <small class="text-muted">Format & Structure<br>
+                                        {% if analysis.format_score >= 18 %}
+                                            <span class="text-success">Excellent</span>
+                                        {% elif analysis.format_score >= 15 %}
+                                            <span class="text-warning">Good</span>
+                                        {% else %}
+                                            <span class="text-danger">Needs Work</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Explanation -->
+    <div class="col-12 mb-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Score Breakdown Explanation
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h6 class="text-primary mb-2">Keyword Match ({{ analysis.keyword_score }}/60)</h6>
+                        <p class="small text-muted mb-2">
+                            This measures how well your resume matches the job requirements. 
+                            Found <strong>{{ matching_keywords|length }}</strong> matching keywords out of key job terms.
+                        </p>
+                        {% if analysis.keyword_score >= 50 %}
+                            <span class="badge bg-success">Strong match with job requirements</span>
+                        {% elif analysis.keyword_score >= 40 %}
+                            <span class="badge bg-warning">Good alignment, could add more keywords</span>
+                        {% else %}
+                            <span class="badge bg-danger">Needs more relevant keywords</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <h6 class="text-success mb-2">Grammar & Language ({{ analysis.grammar_score }}/20)</h6>
+                        <p class="small text-muted mb-2">
+                            Evaluates writing quality, professional language, and readability of your resume content.
+                        </p>
+                        {% if analysis.grammar_score >= 18 %}
+                            <span class="badge bg-success">Professional writing quality</span>
+                        {% elif analysis.grammar_score >= 15 %}
+                            <span class="badge bg-warning">Good, minor improvements needed</span>
+                        {% else %}
+                            <span class="badge bg-danger">Review for grammar and clarity</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <h6 class="text-warning mb-2">Format & Structure ({{ analysis.format_score }}/20)</h6>
+                        <p class="small text-muted mb-2">
+                            Checks for proper resume structure, sections, formatting, and ATS-friendly layout.
+                        </p>
+                        {% if analysis.format_score >= 18 %}
+                            <span class="badge bg-success">Well-structured and ATS-friendly</span>
+                        {% elif analysis.format_score >= 15 %}
+                            <span class="badge bg-warning">Good structure, minor formatting tips</span>
+                        {% else %}
+                            <span class="badge bg-danger">Improve structure and formatting</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="col-md-6 mb-4">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>
+                    Score Breakdown
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="radarChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>
+                    Keyword Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="doughnutChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keywords Section -->
+    <div class="col-12 mb-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-tags me-2"></i>
+                    Keyword Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-success mb-3">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Matching Keywords ({{ matching_keywords|length }})
+                        </h6>
+                        <div class="keyword-container">
+                            {% for keyword in matching_keywords[:15] %}
+                                <span class="badge bg-success me-1 mb-1">{{ keyword }}</span>
+                            {% endfor %}
+                            {% if matching_keywords|length > 15 %}
+                                <span class="text-muted small">... and {{ matching_keywords|length - 15 }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-danger mb-3">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Missing Keywords ({{ missing_keywords|length }})
+                        </h6>
+                        <div class="keyword-container">
+                            {% for keyword in missing_keywords[:15] %}
+                                <span class="badge bg-danger me-1 mb-1">{{ keyword }}</span>
+                            {% endfor %}
+                            {% if missing_keywords|length > 15 %}
+                                <span class="text-muted small">... and {{ missing_keywords|length - 15 }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Suggestions -->
+    <div class="col-12 mb-4">
+        <div class="card bg-dark border-secondary">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-robot me-2"></i>
+                    AI-Powered Suggestions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Format Suggestions -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-layout-text-window me-1"></i>
+                            Format Improvements
+                        </h6>
+                        <ul class="list-unstyled">
+                            {% for suggestion in ai_suggestions.format_suggestions %}
+                                <li class="mb-2">
+                                    <i class="bi bi-arrow-right text-primary me-2"></i>
+                                    {{ suggestion }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Content Suggestions -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-success mb-3">
+                            <i class="bi bi-file-text me-1"></i>
+                            Content Improvements
+                        </h6>
+                        <ul class="list-unstyled">
+                            {% for suggestion in ai_suggestions.content_suggestions %}
+                                <li class="mb-2">
+                                    <i class="bi bi-arrow-right text-success me-2"></i>
+                                    {{ suggestion }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Improvement Examples -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-warning mb-3">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            Improvement Examples
+                        </h6>
+                        <ul class="list-unstyled">
+                            {% for example in ai_suggestions.improvement_examples %}
+                                <li class="mb-2">
+                                    <i class="bi bi-arrow-right text-warning me-2"></i>
+                                    {{ example }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Optimization Tips -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-info mb-3">
+                            <i class="bi bi-gear me-1"></i>
+                            ATS Optimization Tips
+                        </h6>
+                        <ul class="list-unstyled">
+                            {% for tip in ai_suggestions.optimization_tips %}
+                                <li class="mb-2">
+                                    <i class="bi bi-arrow-right text-info me-2"></i>
+                                    {{ tip }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- PDF Download Call-to-Action -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card bg-primary border-0">
+                            <div class="card-body text-center py-4">
+                                <h5 class="text-white mb-3">
+                                    <i class="bi bi-file-earmark-pdf me-2"></i>
+                                    Save Your Complete Analysis Report
+                                </h5>
+                                <p class="text-white-50 mb-3">
+                                    Download a comprehensive PDF report with all your analysis results, suggestions, and improvement recommendations.
+                                </p>
+                                <a href="{{ url_for('download_pdf', analysis_id=analysis.id) }}" class="btn btn-light btn-lg">
+                                    <i class="bi bi-download me-2"></i>
+                                    Download PDF Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Chart data from backend
+const chartData = {
+    keywordScore: {{ analysis.keyword_score }},
+    grammarScore: {{ analysis.grammar_score }},
+    formatScore: {{ analysis.format_score }},
+    matchingKeywords: {{ matching_keywords|length }},
+    missingKeywords: {{ missing_keywords|length }}
+};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Radar Chart
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+new Chart(radarCtx, {
+    type: 'radar',
+    data: {
+        labels: ['Keyword Match', 'Grammar', 'Format'],
+        datasets: [{
+            label: 'Your Score',
+            data: [chartData.keywordScore, chartData.grammarScore, chartData.formatScore],
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13, 110, 253, 0.2)',
+            borderWidth: 2,
+            pointBackgroundColor: '#0d6efd',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#ffffff'
+                }
+            }
+        },
+        scales: {
+            r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    color: '#6c757d',
+                    stepSize: 20
+                },
+                grid: {
+                    color: '#495057'
+                },
+                pointLabels: {
+                    color: '#ffffff',
+                    font: {
+                        size: 12
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Doughnut Chart
+const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+new Chart(doughnutCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Matching Keywords', 'Missing Keywords'],
+        datasets: [{
+            data: [chartData.matchingKeywords, chartData.missingKeywords],
+            backgroundColor: ['#198754', '#dc3545'],
+            borderColor: ['#198754', '#dc3545'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#ffffff',
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

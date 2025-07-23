@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Gopi's Resume Analyzer - Upload & Analyze{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-5 text-light mb-3">
+                <i class="bi bi-search text-primary"></i>
+                Gopi's Resume Analyzer
+            </h1>
+            <p class="lead text-muted">
+                Optimize your resume for Applicant Tracking Systems with AI-powered analysis and suggestions
+            </p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="card bg-dark border-secondary">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-upload me-2"></i>
+                    Upload Resume & Job Description
+                </h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data" id="analysisForm">
+                    <div class="row">
+                        <!-- Resume Upload -->
+                        <div class="col-md-6 mb-4">
+                            <label for="resume" class="form-label">
+                                <i class="bi bi-file-earmark-pdf me-1"></i>
+                                Upload Resume (PDF or DOCX)
+                            </label>
+                            <div class="upload-area border border-2 border-dashed border-secondary rounded p-4 text-center" id="uploadArea">
+                                <i class="bi bi-cloud-upload display-4 text-muted mb-3"></i>
+                                <p class="text-muted mb-2">Drag and drop your resume here</p>
+                                <p class="text-muted small">or click to browse files</p>
+                                <input type="file" class="form-control" id="resume" name="resume" accept=".pdf,.docx" required style="display: none;">
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('resume').click()">
+                                    Choose File
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Supported formats: PDF, DOCX. Max size: 16MB
+                                </small>
+                            </div>
+                            <div id="fileInfo" class="mt-2" style="display: none;">
+                                <div class="alert alert-success py-2">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    <span id="fileName"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="col-md-6 mb-4">
+                            <label for="job_description" class="form-label">
+                                <i class="bi bi-briefcase me-1"></i>
+                                Job Description
+                            </label>
+                            <textarea class="form-control" id="job_description" name="job_description" rows="12" required
+                                      placeholder="Paste the job description here...
+
+Example:
+We are looking for a Software Engineer with experience in:
+- Python, JavaScript, React
+- Database design and optimization
+- Agile development methodologies
+- Strong communication skills
+- 3+ years of experience
+
+Requirements:
+- Bachelor's degree in Computer Science
+- Experience with cloud platforms (AWS, Azure)
+- Knowledge of REST APIs and microservices"></textarea>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-lightbulb me-1"></i>
+                                    Include key requirements, skills, and qualifications from the job posting
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="analyzeBtn">
+                            <i class="bi bi-search me-2"></i>
+                            Analyze Resume
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up text-primary display-5 mb-3"></i>
+                        <h5>ATS Score Analysis</h5>
+                        <p class="text-muted small">Get a comprehensive score based on keyword matching, format, and grammar analysis.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-robot text-primary display-5 mb-3"></i>
+                        <h5>AI-Powered Suggestions</h5>
+                        <p class="text-muted small">Receive intelligent recommendations powered by GPT-4o to optimize your resume.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-eye text-primary display-5 mb-3"></i>
+                        <h5>Visual Analytics</h5>
+                        <p class="text-muted small">Interactive charts and keyword analysis to identify strengths and improvement areas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-download text-primary display-5 mb-3"></i>
+                        <h5>Download Source Code</h5>
+                        <p class="text-muted small mb-3">Get the complete project files including all Python code, templates, and documentation.</p>
+                        <a href="{{ url_for('download_source') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-file-earmark-zip me-1"></i>
+                            Download ZIP
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-body text-center py-5">
+                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="text-light">Analyzing Your Resume</h5>
+                <p class="text-muted">This may take a few moments...</p>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
